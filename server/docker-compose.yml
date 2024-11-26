@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres
+    container_name: syncteam_db
+    restart: always
+    environment:
+      POSTGRES_USER: syncteam_db
+      POSTGRES_PASSWORD: example
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local
