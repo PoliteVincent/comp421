@@ -5,6 +5,7 @@ import { DataTable } from "@/components/DataTable";
 
 import { Student, column } from "@/components/Columns";
 import { students } from "./interfaces/student";
+import axios from "axios";
 
 import {
   DropdownMenu,
@@ -14,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+
+import { ColumnFiltersState } from "@tanstack/react-table";
 
 import {
   Dialog,
@@ -25,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { CreateForm } from "@/components/CreateForm";
 import { IoMdAdd } from "react-icons/io";
+import { UpdateForm } from "@/components/UpdateForm";
 
 // async function getStudents(): Promise<Student> {
 
@@ -33,27 +37,56 @@ import { IoMdAdd } from "react-icons/io";
 const tables: string[] = ["Students", "Posts", "Comments"];
 
 export default function Home() {
-  const [curTable, setCurTable] = useState<"Posts" | "Students">("Posts");
+  const [curTable, setCurTable] = useState<string>("Students");
+  const [data, setData] = useState<any[]>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (curTable === "Students") {
+  //       try {
+  //         const response = await axios.get("api/students");
+  //         const data = await response.data;
+  //         console.log(data); // Use the data as needed
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     } else if (curTable === "Posts") {
+  //       try {
+  //         const response = await axios.get("api/posts");
+  //         const data = await response.data;
+  //         console.log(data); // Use the data as needed
+  //       } catch (error) {
+  //         console.error("Error fetching data:", error);
+  //       }
+  //     }
+  //   };
+  //   fetchData();
+  // }, [curTable]);
   useEffect(() => {
     const fetchData = async () => {
-      if (curTable === "Students") {
-        try {
-          const response = await fetch("http://localhost:5000/students");
-          const data = await response.json();
-          console.log(data); // Use the data as needed
-        } catch (error) {
-          console.error("Error fetching data:", error);
+      try {
+        let endpoint = "";
+        if (curTable === "Students") {
+          endpoint = "api/students";
+        } else if (curTable === "Posts") {
+          endpoint = "api/posts";
         }
-      } else if (curTable === "Posts") {
-        try {
-          const response = await fetch("http://localhost:5000/posts");
-          const data = await response.json();
-          console.log(data); // Use the data as needed
-        } catch (error) {
-          console.error("Error fetching data:", error);
+        if (endpoint) {
+          const response = await axios.get(endpoint);
+          const fetchedData = response.data;
+          // setData(fetchedData); // Update the state with fetched data
+          const combinedData =
+            curTable === "Students"
+              ? [...students, ...fetchedData] // Merge fake and real data
+              : fetchedData;
+
+          setData(combinedData); // Update state with combined data
         }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
+
     fetchData();
   }, [curTable]);
 
@@ -104,8 +137,19 @@ export default function Home() {
               <CreateForm />
             </DialogContent>
           </Dialog>
+          <Dialog>
+            <DialogTrigger className="flex items-center gap-2 ml-2">
+              <IoMdAdd />
+              Update
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogTitle>Update new User</DialogTitle>
+              <UpdateForm />
+            </DialogContent>
+          </Dialog>
         </div>
-        <DataTable columns={column} data={students} />
+        <DataTable columns={column} data={data} />
       </div>
     </>
   );

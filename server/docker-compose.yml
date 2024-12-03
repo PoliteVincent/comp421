@@ -1,10 +1,10 @@
 services:
   db:
     image: postgres
-    container_name: syncteam_db
+    container_name: 421_final
     restart: always
     environment:
-      POSTGRES_USER: syncteam_db
+      POSTGRES_USER: comp421
       POSTGRES_PASSWORD: example
     ports:
       - '5432:5432'

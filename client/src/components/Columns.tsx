@@ -12,6 +12,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import axios from "axios";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@radix-ui/react-dialog";
+import { UpdateForm } from "./UpdateForm";
+import { useState } from "react";
+import { CreateForm } from "./CreateForm";
 
 export interface Student {
   PID: string;
@@ -23,11 +33,8 @@ export interface Student {
   postId?: string;
 }
 const handleDelete = (PID: string) => {
-  //:TODO
-};
-
-const handleUpdate = (PID: string) => {
-  //:TODO
+  axios.delete(`/api/students/${PID}`);
+  window.location.reload();
 };
 
 export const column: ColumnDef<Student>[] = [
@@ -80,8 +87,14 @@ export const column: ColumnDef<Student>[] = [
               Copy PID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleUpdate(student.PID)}>
-              Update Student
+            <DropdownMenuItem>
+              <Dialog>
+                <DialogTrigger>Edit User</DialogTrigger>
+                <DialogContent>
+                  <DialogTitle>Edit User</DialogTitle>
+                  <CreateForm />
+                </DialogContent>
+              </Dialog>
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive"
